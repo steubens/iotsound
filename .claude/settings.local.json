@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh:*)",
+      "Bash(balena version:*)",
+      "Bash(balena whoami:*)",
+      "Bash(balena devices:*)",
+      "Bash(balena device list:*)",
+      "Bash(balena ssh:*)",
+      "Bash(balena help:*)",
+      "Bash(balena device ssh:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
