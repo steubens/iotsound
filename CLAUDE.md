@@ -18,7 +18,11 @@ npm run livepush   # Development mode with nodemon and ts-node
 ```
 
 ### Full deployment
-The application deploys to balenaCloud using `balena push` or the one-click deploy button. Local development uses `docker-compose.yml`.
+Deploy to the balenaCloud fleet from the `scott/customizations` branch:
+```bash
+balena push g_scott_langer/sound
+```
+Local development uses `docker-compose.yml`.
 
 ## Architecture
 
@@ -70,6 +74,33 @@ Plugins must send audio to PulseAudio at `tcp:localhost:4317`. Two methods:
 
 Follow semantic commit conventions for auto-generated changelog. PRs should be squashed before merging using `git rebase -i master`.
 
+## Git Workflow
+
+This repo is a fork of `iotsound/iotsound`. All custom changes live on the `scott/customizations` branch; `master` stays clean and in sync with upstream.
+
+```
+upstream → iotsound/iotsound (original project)
+origin   → steubens/iotsound (our fork on GitHub)
+
+Branches:
+  master               — tracks upstream/master exactly, never commit here
+  scott/customizations — all our changes; deploy from this branch
+```
+
+**Pulling upstream updates:**
+```bash
+git fetch upstream
+git checkout master && git merge upstream/master && git push
+git checkout scott/customizations && git rebase master
+```
+
+**Deploy after changes:**
+```bash
+git add <files> && git commit -m "..."
+git push
+balena push g_scott_langer/sound
+```
+
 ## Infrastructure
 
 ### Snapcast LXC Server (10.7.7.221)
@@ -100,13 +131,14 @@ See `docs/SNAPCAST-LXC-SERVER.md` for full configuration guide.
 ### balenaCloud Fleet
 
 **Fleet:** `g_scott_langer/sound`
+**Fleet type:** `raspberry-pi` (supports Pi 1/Zero through Pi 4; kept broad to allow Pi Zero devices if added)
 
 **Devices:**
-| Device | Type | IP | Role |
-|--------|------|-----|------|
-| LivRm-Master | Pi 4 | 10.7.2.184 (WiFi) | Client |
-| Kitchen | Pi 3 | - | Client |
-| BedRm | Pi 4 | - | Client |
+| Device | UUID | Type | OS Version | Supervisor | Role |
+|--------|------|------|------------|------------|------|
+| Bedroom | `835dcd5` | Pi 4 (`raspberrypi4-64`) | balenaOS 6.10.24+rev1 | 17.5.3 | Client |
+| Kitchen | `74a8ccd` | Pi 4 (`raspberrypi4-64`) | balenaOS 6.10.24+rev1 | 17.5.3 | Client |
+| Living Room | `98d060a` | Pi 3 (`raspberrypi3`) | balenaOS 6.10.24+rev1 | 17.5.3 | Client |
 
 **Client Configuration:**
 ```
@@ -116,8 +148,9 @@ SOUND_MULTIROOM_MASTER=10.7.7.221
 
 **balena CLI Access:**
 ```bash
-balena device ssh <device-uuid>           # Via cloud
+balena device ssh <uuid>                  # Via cloud
 balena device ssh <ip> -p 22222           # Direct local
+balena device list --fleet g_scott_langer/sound  # List all devices
 ```
 
 ### WiFi Configuration (balenaOS)
