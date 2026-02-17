@@ -7,4 +7,4 @@ node_modules
 build
 core/multiroom/server/snapweb
 labs-docs-builder
-.claude/settings.local.json
+**/.claude/settings.local.json
